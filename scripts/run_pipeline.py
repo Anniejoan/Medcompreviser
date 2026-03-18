@@ -2,6 +2,7 @@ from medcompreviser.llm import VLLMChatClient
 from medcompreviser.rewrite import QwenRewriter
 from medcompreviser.verify import verify_rewrite
 from medcompreviser.definitions import DefinitionRefiner
+from medcompreviser.semantic_verify import EntailmentVerifier
 import os
 
 
@@ -52,6 +53,23 @@ Reduce sodium intake and follow up with your clinician in two weeks.
         rewritten_text=result.rewritten_text,
     )
 
+    entailment_verifier = EntailmentVerifier(
+        model_name="facebook/bart-large-mnli",
+         device="cpu",
+        entailment_threshold=0.45,
+        contradiction_threshold=0.35,
+    )
+
+    matched_source_sentences = [
+        mapping.matched_source_sentences for mapping in verification.mappings
+    ]
+
+    semantic_verification = entailment_verifier.verify_from_mapping(
+        rewritten_sentences=verification.rewritten_sentences,
+        matched_source_sentences=matched_source_sentences,
+    )
+
+
     definition_result = definition_refiner.refine(
         rewritten_text=result.rewritten_text,
         existing_glossary=result.glossary,
@@ -66,6 +84,12 @@ Reduce sodium intake and follow up with your clinician in two weeks.
     print("\nFINAL GLOSSARY:\n", [item.__dict__ for item in definition_result.glossary])
     print("\nVERIFICATION SUMMARY:\n", verification.summary)
     print("\nDEFINITION NOTES:\n", definition_result.notes)
+    print("\nSEMANTIC VERIFICATION SUMMARY:\n", semantic_verification.summary)
+
+    if semantic_verification.failed_sentences:
+        print("\nSEMANTICALLY FLAGGED SENTENCES:")
+        for s in semantic_verification.failed_sentences:
+            print("-", s)
 
     if verification.unsupported_rewritten_sentences:
         print("\nUNSUPPORTED REWRITTEN SENTENCES:")
