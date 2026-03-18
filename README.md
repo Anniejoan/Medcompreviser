@@ -17,7 +17,7 @@ This repo currently supports:
 
 ## Project Structure
 
-```Medcompreviser/
+Medcompreviser/
     scripts/
         start_qwen.sh # Start local LLM server
         run_pipeline.py # Run rewrite pipeline
@@ -29,11 +29,10 @@ This repo currently supports:
         eval.py
     data/de_novo/
     outputs/ 
-```
+
 ---
 
 ## Setup
-
 ### 1. Create environment
 
 ```bash
