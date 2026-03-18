@@ -1,12 +1,13 @@
 from medcompreviser.llm import VLLMChatClient
 from medcompreviser.rewrite import QwenRewriter
+from medcompreviser.verify import verify_rewrite
 
 
 if __name__ == "__main__":
     source_text = """
-    Hypertension means high blood pressure. You should take your medication twice daily after meals.
-    Reduce sodium intake and follow up with your clinician in two weeks.
-    """
+Hypertension means high blood pressure. You should take your medication twice daily after meals.
+Reduce sodium intake and follow up with your clinician in two weeks.
+"""
 
     patient_profile = {
         "age_group": "older adult",
@@ -16,7 +17,7 @@ if __name__ == "__main__":
 
     personalization_plan = {
         "diet": "Use familiar examples when explaining low-salt food choices.",
-        "definitions": "Define medical words in plain language."
+        "definitions": "Define medical words in plain language.",
     }
 
     client = VLLMChatClient(
@@ -39,8 +40,31 @@ if __name__ == "__main__":
         track_definitions=True,
     )
 
+    verification = verify_rewrite(
+        source_text=source_text,
+        rewritten_text=result.rewritten_text,
+    )
+
     print("Attempts:", result.attempts)
     print("Source grade:", result.source_grade)
     print("Final grade:", result.final_grade)
+    print("Accepted by verifier:", verification.accepted)
+
     print("\nREWRITTEN TEXT:\n", result.rewritten_text)
     print("\nGLOSSARY:\n", result.glossary)
+    print("\nVERIFICATION SUMMARY:\n", verification.summary)
+
+    if verification.unsupported_rewritten_sentences:
+        print("\nUNSUPPORTED REWRITTEN SENTENCES:")
+        for s in verification.unsupported_rewritten_sentences:
+            print("-", s)
+
+    if verification.possibly_dropped_source_sentences:
+        print("\nPOSSIBLY DROPPED SOURCE SENTENCES:")
+        for s in verification.possibly_dropped_source_sentences:
+            print("-", s)
+
+    if verification.numeric_mismatches:
+        print("\nNUMERIC MISMATCHES:")
+        for item in verification.numeric_mismatches:
+            print(item)
