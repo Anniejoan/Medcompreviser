@@ -1,10 +1,10 @@
 # Medcompreviser
 
-Medcompreviser is a locally hosted vLLM server (Qwen2.5-14B) pipeline for rewriting patient education materials (PEMs) into plain language (≈6th-grade reading level), with verification and glossary generation.
+Medcompreviser is a locally hosted vLLM server (Qwen2.5-14B) pipeline for rewriting patient education materials (PEMs) into plain language (≈6th-grade reading level), with verification and glossary generation. It reads a PDF
+and writes a JSON artifact to outputs.
 
 The pipeline includes an optional semantic verification step using an NLI model.
 By default it uses facebook/bart-large-mnli, which Hugging Face documents as a checkpoint trained on MultiNLI and explicitly demonstrates for entailment-style classification by comparing a premise and a hypothesis.
-
 This step checks whether rewritten sentences are semantically supported by their mapped source sentences.
 
 This repo currently supports:
@@ -73,7 +73,11 @@ bash scripts/check_server.sh
 
 Then run;
 ```
-python scripts/run_pipeline.py
+python scripts/run_pipeline.py \
+  --input data/de_novo/1.pdf \
+  --output outputs/1_sample_run.json \
+  --target-grade 6 \
+  --model-name qwen14b
 ```
 
 **Output**
