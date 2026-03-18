@@ -1,2 +1,10 @@
-textstat 
-pypdf
+vllm
+transformers
+torch
+numpy
+pandas
+textstat
+scikit-learn
+nltk
+python-dotenv
+accelerate

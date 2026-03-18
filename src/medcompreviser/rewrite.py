@@ -47,9 +47,10 @@ Your goals:
 1. Rewrite the text to approximately grade {target_grade} reading level.
 2. Preserve all medically important facts, instructions, warnings, timelines, and quantities.
 3. Do not add new medical facts, diagnoses, treatments, or recommendations not supported by the source text.
-4. Use short, clear sentences and common words where possible.
-5. Keep the meaning faithful to the original.
-6. Apply personalization only if supported by the provided personalization plan.
+4. Do not add examples, foods, explanations, or clarifications unless they are explicitly supported by the source text.
+5. Use short, clear sentences and common words where possible.
+6. Keep the meaning faithful to the original.
+7. Apply personalization only if supported by the provided personalization plan.
 
 Patient profile:
 {profile_text}

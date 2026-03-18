@@ -15,8 +15,8 @@ class VLLMChatClient:
 
         self.model_name = model_name
         self.client = OpenAI(base_url=base_url, api_key=api_key)
-        print("Using base_url:", base_url)
-        print("Using model_name:", model_name)
+        #print("Using base_url:", base_url)
+        #print("Using model_name:", model_name)
 
     def chat(
         self,
