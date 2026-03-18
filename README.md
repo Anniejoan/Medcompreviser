@@ -16,8 +16,8 @@ This repo currently supports:
 ---
 
 ## Project Structure
-
-Medcompreviser/
+```
+```Medcompreviser/
     scripts/
         start_qwen.sh # Start local LLM server
         run_pipeline.py # Run rewrite pipeline
@@ -28,7 +28,7 @@ Medcompreviser/
         definitions.py
         eval.py
     data/de_novo/
-    outputs/
+    outputs/ ```
 
 ---
 
@@ -123,21 +123,25 @@ Future versions will save structured JSON outputs to /outputs.
 ### Troubleshooting
 
 *Module not found (medcompreviser)*
+        
         pip install -e .
 
 *Port 8000 connection refused*
+        
         Model server not running or crashed
         Check logs or restart start_qwen.sh
 
 *No space left on device*
+        
         Ensure HuggingFace cache is redirected to scratch
     
 *Port Conflict* 
+
 If you see an error like 
-            "OSError: [Errno 98] Address already in use"
+           ``` OSError: [Errno 98] Address already in use ```
 it means the port is already being used (often by another user on the same node). Solution is to use another port.    
-    Eg.     "bash scripts/start_qwen.sh 8101
-            export VLLM_BASE_URL=http://127.0.0.1:8101/v1"
+    Eg.     ```bash scripts/start_qwen.sh 8101
+            export VLLM_BASE_URL=http://127.0.0.1:8101/v1 ```
 
 Note that 
 - The port must match between:
