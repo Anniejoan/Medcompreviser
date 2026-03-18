@@ -1,6 +1,7 @@
 from medcompreviser.llm import VLLMChatClient
 from medcompreviser.rewrite import QwenRewriter
 from medcompreviser.verify import verify_rewrite
+from medcompreviser.definitions import DefinitionRefiner
 
 
 if __name__ == "__main__":
@@ -33,6 +34,11 @@ Reduce sodium intake and follow up with your clinician in two weeks.
         min_grade_drop=1.0,
     )
 
+    definition_refiner = DefinitionRefiner(
+        client=client,
+        max_terms=8,
+    )
+
     result = rewriter.rewrite(
         source_text=source_text,
         patient_profile=patient_profile,
@@ -45,14 +51,20 @@ Reduce sodium intake and follow up with your clinician in two weeks.
         rewritten_text=result.rewritten_text,
     )
 
+    definition_result = definition_refiner.refine(
+        rewritten_text=result.rewritten_text,
+        existing_glossary=result.glossary,
+    )
+
     print("Attempts:", result.attempts)
     print("Source grade:", result.source_grade)
     print("Final grade:", result.final_grade)
     print("Accepted by verifier:", verification.accepted)
 
     print("\nREWRITTEN TEXT:\n", result.rewritten_text)
-    print("\nGLOSSARY:\n", result.glossary)
+    print("\nFINAL GLOSSARY:\n", [item.__dict__ for item in definition_result.glossary])
     print("\nVERIFICATION SUMMARY:\n", verification.summary)
+    print("\nDEFINITION NOTES:\n", definition_result.notes)
 
     if verification.unsupported_rewritten_sentences:
         print("\nUNSUPPORTED REWRITTEN SENTENCES:")
