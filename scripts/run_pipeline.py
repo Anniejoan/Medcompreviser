@@ -1,38 +1,46 @@
-from medcompreviser.eval import readability_metrics
-from medcompreviser.rewrite import build_rewrite_prompt, parse_rewrite_response
+from medcompreviser.llm import VLLMChatClient
+from medcompreviser.rewrite import QwenRewriter
 
 
 if __name__ == "__main__":
-    sample_text = (
-        "Hypertension means high blood pressure. "
-        "You should take your medication twice daily and reduce salt intake."
+    source_text = """
+    Hypertension means high blood pressure. You should take your medication twice daily after meals.
+    Reduce sodium intake and follow up with your clinician in two weeks.
+    """
+
+    patient_profile = {
+        "age_group": "older adult",
+        "health_literacy": "low",
+        "language_preference": "English",
+    }
+
+    personalization_plan = {
+        "diet": "Use familiar examples when explaining low-salt food choices.",
+        "definitions": "Define medical words in plain language."
+    }
+
+    client = VLLMChatClient(
+        base_url="http://127.0.0.1:8000/v1",
+        model_name="Qwen/Qwen2.5-14B-Instruct",
     )
 
-    prompt = build_rewrite_prompt(
-        source_text=sample_text,
+    rewriter = QwenRewriter(
+        client=client,
         target_grade=6,
-        patient_profile={"age_group": "older adult", "health_literacy": "low"},
-        personalization_plan={"diet": "reduce sodium intake using familiar foods"},
+        max_attempts=3,
+        grade_tolerance=0.5,
+        min_grade_drop=1.0,
+    )
+
+    result = rewriter.rewrite(
+        source_text=source_text,
+        patient_profile=patient_profile,
+        personalization_plan=personalization_plan,
         track_definitions=True,
     )
 
-    print("PROMPT PREVIEW:\n")
-    print(prompt[:1000])
-
-    fake_response = """
-REWRITTEN_TEXT:
-High blood pressure means your blood pressure is too high. Take your medicine two times each day. Eat less salt to help control your blood pressure.
-
-GLOSSARY:
-- hypertension: high blood pressure
-- sodium: salt
-""".strip()
-
-    parsed = parse_rewrite_response(fake_response)
-
-    print("\nPARSED OUTPUT:\n")
-    print(parsed.rewritten_text)
-    print(parsed.glossary)
-
-    print("\nREADABILITY:\n")
-    print(readability_metrics(parsed.rewritten_text))
+    print("Attempts:", result.attempts)
+    print("Source grade:", result.source_grade)
+    print("Final grade:", result.final_grade)
+    print("\nREWRITTEN TEXT:\n", result.rewritten_text)
+    print("\nGLOSSARY:\n", result.glossary)
