@@ -1,6 +1,6 @@
 # Medcompreviser
 
-Medcompreviser is a local LLM pipeline for rewriting patient education materials (PEMs) into plain language (≈6th-grade reading level), with verification and glossary generation.
+Medcompreviser is a locally hosted vLLM server (Qwen2.5-14B) pipeline for rewriting patient education materials (PEMs) into plain language (≈6th-grade reading level), with verification and glossary generation.
 
 This repo currently supports:
 
@@ -43,10 +43,10 @@ pip install -e .
 srun --account=accountname --partition=spgpu --gpu=1 --mem=24G --cpus-per-task=2 --time=02:00:00 --pty bash
 
 
-### 3. Start the model server
+### 3. Start the model server (choose a port, e.g., 8100)
 
 ```
-bash scripts/start_qwen.sh
+bash scripts/start_qwen.sh 8100
 ```
 
 Wait unitil you see: Application startup complete
@@ -54,10 +54,20 @@ Wait unitil you see: Application startup complete
 
 ### 4. Run the pipeline
 
-In another terminal on the same node:
+In another terminal, ssh into the same node, run:
 
 ```
 source .venv312/bin/activate
+export VLLM_BASE_URL=http://127.0.0.1:8100/v1
+```
+
+Check that it is set correctly:
+```
+bash scripts/check_server.sh
+```
+
+Then run;
+```
 python scripts/run_pipeline.py
 ```
 
@@ -103,17 +113,29 @@ Future versions will save structured JSON outputs to /outputs.
 
 ### Troubleshooting
 
-Module not found (medcompreviser)
+*Module not found (medcompreviser)*
         pip install -e .
 
-Port 8000 connection refused
+*Port 8000 connection refused*
         Model server not running or crashed
         Check logs or restart start_qwen.sh
 
-No space left on device
+*No space left on device*
         Ensure HuggingFace cache is redirected to scratch
+    
+*Port Conflict* 
+If you see an error like 
+            "OSError: [Errno 98] Address already in use"
+it means the port is already being used (often by another user on the same node). Solution is to use another port.    
+    Eg.     "bash scripts/start_qwen.sh 8101
+            export VLLM_BASE_URL=http://127.0.0.1:8101/v1"
 
-
+Note that 
+- The port must match between:
+    - start_qwen.sh
+    - VLLM_BASE_URL
+- Default is 8000, but using 8100+ is recommended on shared systems.
+- The server must be running before executing run_pipeline.py.
 
 ### License
 MIT License

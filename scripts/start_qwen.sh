@@ -1,4 +1,7 @@
 #!/bin/bash
+
+PORT=${1:-8000}
+
 module purge
 module load python/3.12.1
 module load cuda/12.8.1
@@ -6,10 +9,9 @@ module load cuda/12.8.1
 cd ~/Medcompreviser
 source .venv312/bin/activate
 
-export CUDA_HOME=$(dirname $(dirname $(which nvcc)))
+export CUDA_HOME=$(dirname "$(dirname "$(which nvcc)")")
 export HF_HOME=/scratch/mihalcea_root/mihalcea0/jnwatu/hf_cache
 export HUGGINGFACE_HUB_CACHE=/scratch/mihalcea_root/mihalcea0/jnwatu/hf_cache
-export TRANSFORMERS_CACHE=/scratch/mihalcea_root/mihalcea0/jnwatu/hf_cache
 export XDG_CACHE_HOME=/scratch/mihalcea_root/mihalcea0/jnwatu/xdg_cache
 export VLLM_CACHE_ROOT=/scratch/mihalcea_root/mihalcea0/jnwatu/vllm_cache
 export TMPDIR=/scratch/mihalcea_root/mihalcea0/jnwatu/tmp
@@ -18,7 +20,8 @@ export VLLM_NO_USAGE_STATS=1
 
 python -m vllm.entrypoints.openai.api_server \
   --model Qwen/Qwen2.5-14B-Instruct \
+  --served-model-name qwen14b \
   --dtype half \
   --max-model-len 8192 \
   --gpu-memory-utilization 0.90 \
-  --port 8000
+  --port "$PORT"

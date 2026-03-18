@@ -2,6 +2,7 @@ from medcompreviser.llm import VLLMChatClient
 from medcompreviser.rewrite import QwenRewriter
 from medcompreviser.verify import verify_rewrite
 from medcompreviser.definitions import DefinitionRefiner
+import os
 
 
 if __name__ == "__main__":
@@ -22,8 +23,8 @@ Reduce sodium intake and follow up with your clinician in two weeks.
     }
 
     client = VLLMChatClient(
-        base_url="http://127.0.0.1:8000/v1",
-        model_name="Qwen/Qwen2.5-14B-Instruct",
+        base_url=os.getenv("VLLM_BASE_URL"),
+        model_name="qwen14b",
     )
 
     rewriter = QwenRewriter(
