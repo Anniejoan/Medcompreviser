@@ -17,6 +17,7 @@ This repo currently supports:
 
 ## Project Structure
 
+```
 Medcompreviser/
     scripts/
         start_qwen.sh # Start local LLM server
@@ -29,7 +30,7 @@ Medcompreviser/
         eval.py
     data/de_novo/
     outputs/ 
-
+```
 ---
 
 ## Setup
